@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Tap</title>
+</head>
+<body>
+    <div class = 'page-header'>
+        <h1>** Base Flask **</h1>
+        <h3>- Menu Bar</h3>
+        <div class="Menu-bar">
+            <ul class="menu-bar">
+                <li><a href = "{{url_for('basic')}}">Home</a></li>
+                <li><a href = "{{url_for('info')}}">Info</a></li>
+            </ul>
+        </div>
+        <hr/>
+    </div>
+    <div class = 'content container'>
+        <div class = 'row'>
+            <div class="col-md-8">
+                {% block content %}
+                    <h3>------Base Homepage-----</h3>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    <div class = "page-botton">
+    </div>
+</body>
+</html>
