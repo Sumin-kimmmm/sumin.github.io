@@ -3,107 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>간단한 슬라이드 쇼</title>
+<title>동아리 활동 게시판</title>
 <style>
   /* CSS 코드 */
-  .slideshow-container {
+  .image-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-items: center;
+    overflow: hidden; /* 슬라이드 형태로 보여줄 때 넘치는 이미지를 숨깁니다. */
+  }
+
+  .slide-wrapper {
+    display: flex;
+    overflow-x: auto; /* 가로로 넘치는 이미지를 슬라이드 형태로 스크롤합니다. */
+    scroll-snap-type: x mandatory; /* x축으로 스크롤하도록 설정합니다. */
+    -webkit-overflow-scrolling: touch; /* iOS 스크롤링을 부드럽게 처리합니다. */
+    width: 100%;
+    scroll-behavior: smooth; /* 스크롤 시 부드럽게 움직이도록 설정합니다. */
+  }
+
+  .image-card {
     position: relative;
-    max-width: 800px;
-    margin: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 100%;
+    flex: 0 0 auto; /* 가로로 슬라이드될 때 이미지 카드가 너비를 조정하지 않도록 설정합니다. */
   }
 
-  .slide {
-    display: none;
-    text-align: center; /* 이미지를 가운데 정렬하기 위해 추가 */
+  .image-card img {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 
-  .slide img {
-    width: 50%; /* 이미지 크기를 조정합니다. */
-    max-width: 100%; /* 이미지가 부모 요소의 크기를 넘어서지 않도록 설정합니다. */
-    display: inline-block; /* 이미지를 가운데 정렬하기 위해 추가 */
-    margin: 0 auto; /* 이미지를 가운데 정렬하기 위해 추가 */
+  .image-description {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
   }
 
-  .caption,
-  .date {
-    text-align: center;
-    margin-top: 10px;
-  }
-
-  .prev,
-  .next {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    width: auto;
-    padding: 16px;
-    margin-top: -22px;
-    color: white;
+  .image-title {
     font-weight: bold;
-    font-size: 20px;
-    transition: 0.6s ease;
-    border-radius: 0 3px 3px 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    margin-bottom: 5px;
   }
 
-  .prev {
-    left: 0;
-    border-radius: 3px 0 0 3px;
+  .delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0; /* 초기에는 숨깁니다. */
+    transition: opacity 0.3s ease;
   }
 
-  .next {
-    right: 0;
-    border-radius: 3px 0 0 3px;
+  .delete-button:hover {
+    background-color: rgba(255, 0, 0, 0.9);
   }
 
-  .prev:hover,
-  .next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
+  .image-card:hover .delete-button {
+    opacity: 1; /* 마우스 호버시 버튼이 나타납니다. */
   }
 </style>
 </head>
 <body>
-<div class="slideshow-container">
-  <div class="slide fade">
-    <img src="{{url_for('static', filename='image1.jpg')}}">
-    <div class="caption">동아리모임</div>
-    <div class="date">2024-00-00</div>
+<h1>동아리 활동 게시판</h1>
+<input type="file" id="fileUpload" accept="image/*" onchange="handleFileSelect(event)">
+<div class="slide-wrapper">
+  <div class="image-container" id="imageContainer">
+    
   </div>
-  <div class="slide fade">
-    <img src="{{url_for('static', filename='image2.png')}}">
-    <div class="caption">설명</div>
-    <div class="date">2024-00-00</div>
-  </div>
-  <div class="slide fade">
-    <img src="{{url_for('static', filename='image1.jpg')}}">
-    <div class="caption">설명</div>
-    <div class="date">2024-00-00</div>
-  </div>
-  <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-  <a class="next" onclick="plusSlides(1)">&#10095;</a>
 </div>
 <script>
   // JavaScript 코드
-  let slideIndex = 1;
-  showSlides(slideIndex);
+  function addImagePreview(imageSrc, title, description) {
+    const imageContainer = document.getElementById('imageContainer');
+    const imageCard = document.createElement('div');
+    imageCard.classList.add('image-card');
 
-  function plusSlides(n) {
-    showSlides(slideIndex += n);
+    const image = document.createElement('img');
+    image.src = imageSrc;
+
+    const descriptionDiv = document.createElement('div');
+    descriptionDiv.classList.add('image-description');
+
+    const titleElem = document.createElement('div');
+    titleElem.classList.add('image-title');
+    titleElem.textContent = title;
+
+    const descriptionElem = document.createElement('div');
+    descriptionElem.textContent = description;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = '삭제';
+    deleteButton.classList.add('delete-button');
+    deleteButton.onclick = function() {
+      imageContainer.removeChild(imageCard);
+    };
+
+    descriptionDiv.appendChild(titleElem);
+    descriptionDiv.appendChild(descriptionElem);
+
+    imageCard.appendChild(image);
+    imageCard.appendChild(descriptionDiv);
+    imageCard.appendChild(deleteButton);
+
+    imageContainer.appendChild(imageCard);
   }
 
-  function showSlides(n) {
-    let i;
-    const slides = document.getElementsByClassName("slide");
-    if (n > slides.length) {
-      slideIndex = 1;
+  function handleFileSelect(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const title = prompt("사진의 제목을 입력하세요.");
+        const description = prompt("사진에 대한 간략한 설명을 입력하세요.");
+        addImagePreview(e.target.result, title, description);
+      }
+      reader.readAsDataURL(files[0]);
     }
-    if (n < 1) {
-      slideIndex = slides.length;
-    }
-    for (i = 0; i < slides.length; i++) {
-      slides[i].style.display = "none";
-    }
-    slides[slideIndex - 1].style.display = "block";
   }
 </script>
 </body>
